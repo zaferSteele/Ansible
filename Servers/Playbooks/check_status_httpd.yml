@@ -1,0 +1,20 @@
+- name: Check httpd status
+  hosts: fedora
+  become: true
+  gather_facts: true # this is the default settings but only a declarative line
+  collections:
+    - ansible.builtin
+
+  tasks:
+  - name: Start httpd service
+    systemd:
+      name: httpd
+      state: started
+
+  - name: Run systemctl status command and store output in variable
+    command: systemctl status httpd # The command we want to run
+    register: httpd_status_output # save output of the command saved in a variable
+
+  - name: Print httpd status
+    debug: # prints the value of a variable
+      var: httpd_status_output.stdout_lines # specifies the variable to be printed

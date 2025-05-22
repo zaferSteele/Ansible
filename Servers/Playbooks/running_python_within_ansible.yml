@@ -1,0 +1,9 @@
+- name: Run compare.py
+  hosts: localhost
+  become: true
+  collections:
+    - ansible.builtin
+
+  tasks:
+    - name: Run compare.py
+      command: python3 ./compare.py

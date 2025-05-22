@@ -1,0 +1,41 @@
+- hosts: all
+  become: true
+  pre_tasks:
+  collections:
+    - ansible.builtin
+
+  - name: install updates (Ubuntu)
+    tags: always
+    apt:
+      upgrade: dist
+      update_cache: yes
+    when: ansible_distribution == "Ubuntu"
+
+  - name: install updates (Fedora)
+    tags: always
+    dnf:
+      update_only: yes
+      update_cache: yes
+    when: ansible_distribution == "Fedora"
+
+- hosts: linux
+  become: true
+  tasks:
+
+  - name: install apache2 & PHP packages for Ubuntu
+    tags: ubuntu,apache
+    apt:
+      name:
+        - apache2
+        - libapache2-mod-php
+      state: latest
+    when: ansible_distribution == "Ubuntu"
+
+  - name: install httpd & php packages for Fedora/CentOS
+    tags: fedora,httpd
+    dnf:
+      name:
+        - httpd
+        - php
+      state: latest
+    when: ansible_distribution == "Fedora"

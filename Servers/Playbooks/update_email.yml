@@ -1,0 +1,19 @@
+- hosts: fedora
+  become: true
+  collections:
+    - ansible.builtin
+
+  tasks:
+  - name: change e-mail address for httpd admin
+    lineinfile:
+      path: /etc/httpd/conf/httpd.conf
+      regexp: '^ServerAdmin'
+      line: ServerAdmin jdoe@ansnetauto.com
+    when: ansible_distribution == "Fedora"
+    register: httpd
+
+  - name: restart httpd for Fedora
+    service:
+      name: httpd
+      state: restarted
+    when: httpd.changed

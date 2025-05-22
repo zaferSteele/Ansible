@@ -1,0 +1,15 @@
+- hosts: all
+  become: true
+  gather_facts: false
+  collections:
+    - ansible.builtin
+
+  tasks:
+  - name: get contents of file
+    command: cat /var/www/html/index.html # command to run
+    register: file_output # register read content
+    become: true
+
+  - name: View the file contents
+    debug: # debug captuere message
+      msg: "{{file_output.stdout .split('\n') }}" # by adding .split(‘\n’) reads the outpu line by line

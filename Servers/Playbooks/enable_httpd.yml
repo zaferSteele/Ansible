@@ -1,0 +1,21 @@
+- name: Check httpd status
+  hosts: fedora
+  become: true
+  gather_facts: true
+  collections:
+    - ansible.builtin
+
+  tasks:
+  - name: Start httpd service
+    systemd:
+      name: httpd
+      state: started  # ensure the service is in started state
+      enabled: yes # the service or daemon is enabled to start automatically at boot time
+
+  - name: Run systemctl status command and store output in variable
+    command: systemctl status httpd
+    register: httpd_status_output
+
+  - name: Print httpd status
+    debug:
+      var: httpd_status_output.stdout_lines

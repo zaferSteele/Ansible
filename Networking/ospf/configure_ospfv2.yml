@@ -1,0 +1,45 @@
+- name: Configure OSPF 1 on Cisco IOS-XE routers
+  hosts: router_type1
+  gather_facts: false
+
+  tasks:
+    - name: Configure OSPF on routers
+      cisco.ios.ios_command:
+        commands:
+          - "configure terminal"
+          - "router ospf 1"
+          - "router-id {{ inventory_hostname[-1] }}.{{ inventory_hostname[-1] }}.{{ inventory_hostname[-1] }}.{{ inventory_hostname[-1] }}"
+          - "network 1.1.{{ inventory_hostname[-1] }}0.{{ inventory_hostname[-1] }} 0.0.0.0 area 0"
+          - "network 1.1.123.{{ inventory_hostname[-1] }} 0.0.0.0 area 0"
+      when: inventory_hostname in ['r1']
+
+    - name: Configure OSPF on routers
+      cisco.ios.ios_command:
+        commands:
+          - "configure terminal"
+          - "router ospf 1"
+          - "router-id {{ inventory_hostname[-1] }}.{{ inventory_hostname[-1] }}.{{ inventory_hostname[-1] }}.{{ inventory_hostname[-1] }}"
+          - "network 1.1.123.{{ inventory_hostname[-1] }} 0.0.0.0 area 0"
+          - "network 1.1.24.{{ inventory_hostname[-1] }} 0.0.0.0 area 1"
+      when: inventory_hostname in ['r2']
+
+    - name: Configure OSPF on routers
+      cisco.ios.ios_command:
+        commands:
+          - "configure terminal"
+          - "router ospf 1"
+          - "router-id {{ inventory_hostname[-1] }}.{{ inventory_hostname[-1] }}.{{ inventory_hostname[-1] }}.{{ inventory_hostname[-1] }}"
+          - "network 1.1.123.{{ inventory_hostname[-1] }} 0.0.0.0 area 0"
+          - "network 1.1.34.{{ inventory_hostname[-1] }} 0.0.0.0 area 1"
+      when: inventory_hostname in ['r3']
+
+    - name: Configure OSPF on routers
+      cisco.ios.ios_command:
+        commands:
+          - "configure terminal"
+          - "router ospf 1"
+          - "router-id {{ inventory_hostname[-1] }}.{{ inventory_hostname[-1] }}.{{ inventory_hostname[-1] }}.{{ inventory_hostname[-1] }}"
+          - "network 1.1.24.{{ inventory_hostname[-1] }} 0.0.0.0 area 1"
+          - "network 1.1.34.{{ inventory_hostname[-1] }} 0.0.0.0 area 1"
+          - "network 1.1.{{ inventory_hostname[-1] }}0.{{ inventory_hostname[-1] }} 0.0.0.0 area 1"
+      when: inventory_hostname in ['r4']

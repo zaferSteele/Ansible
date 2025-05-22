@@ -1,0 +1,19 @@
+- name: Ping hosts and save output
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Ping hosts
+      ansible.builtin.raw: ping -c 4 {{ item }}
+      register: ping_output
+      loop:
+        - 192.168.127.11
+        - 192.168.127.21
+        - 192.168.127.22
+        - 192.168.127.23
+        - 192.168.127.24
+      failed_when: false
+    - name: Save output to file
+      ansible.builtin.copy:
+        content: "{{ ping_output.results | map(attribute='stdout') | join('\n') }}"
+        dest: 12.3_icmp_output.txt

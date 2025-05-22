@@ -1,0 +1,66 @@
+- name: Configure IOS-XE switches
+  hosts: switch_type1
+  gather_facts: no
+
+  vars_files:
+    - vars.yml
+
+  tasks:
+    - name: Configure trunk port on sw1’s Gi3/3
+      cisco.ios.ios_command:
+        commands:
+          - "configure terminal"
+          - "interface g3/3"
+          - "switchport trunk encapsulation dot1q"
+          - "switchport mode trunk"
+          - "switchport trunk allowed vlan 10,20"
+      when: inventory_hostname=='sw1'
+
+    - name: Configure trunk ports on sw1, sw2
+      cisco.ios.ios_command:
+        commands:
+          - "configure terminal"
+          - "interface range g0/1,g0/2"
+          - "switchport trunk encapsulation dot1q"
+          - "switchport mode trunk"
+          - "switchport trunk allowed vlan 10,20"
+      when: inventory_hostname in ['sw1', 'sw2']
+
+    - name: Configure trunk ports on sw3, sw4
+      cisco.ios.ios_command:
+        commands:
+          - "configure terminal"
+          - "interface range g0/2,g0/3"
+          - "switchport trunk encapsulation dot1q"
+          - "switchport mode trunk"
+          - "switchport trunk allowed vlan 10,20"
+      when: inventory_hostname in ['sw3', 'sw4']
+
+    - name: Configure VTP on all switches
+      cisco.ios.ios_command:
+        commands:
+          - "configure terminal"
+          - "vtp domain ansible-vtp01"
+          - "vtp password ansible"
+
+    - name: Configure VLANs on sw1
+      cisco.ios.ios_command:
+        commands:
+          - "configure terminal"
+          - "vlan 10"
+          - "name VLAN-10"
+          - "vlan 20"
+          - "name VLAN-20"
+      when: inventory_hostname == 'sw1'
+
+    - name: Configure access ports on sw4
+      cisco.ios.ios_command:
+        commands:
+          - "configure terminal"
+          - "interface Gi1/1"
+          - "switchport mode access"
+          - "switchport access vlan 10"
+          - "interface Gi1/2"
+          - "switchport mode access"
+          - "switchport access vlan 20"
+      when: inventory_hostname == 'sw4'

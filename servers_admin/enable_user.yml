@@ -1,0 +1,24 @@
+- hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+  - name: create a new user
+    ansible.builtin.user:
+      name: jsmith
+      group: root
+
+  - name: add ssh key for jsmith
+    tags: always
+    ansible.posix.authorized_key:
+      user: jsmith
+      key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFvayxHfA8pjZTldlXQdVPEK+fdjFekSPx9E4bnbPl0b ansible"
+
+  - name: add sudoers file for jsmith
+    tags: always
+    ansible.builtin.copy:
+      src: sudoer_jsmith
+      dest: /etc/sudoers.d/jsmith
+      owner: root
+      group: root
+      mode: 0440

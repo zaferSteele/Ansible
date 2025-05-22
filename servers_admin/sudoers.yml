@@ -1,0 +1,12 @@
+- name: Run ls -l /etc/sudoers.d command and output to screen
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Run ls -l /etc/sudoers.d command
+      ansible.builtin.shell: ls -l /etc/sudoers.d
+      register: sudoers_output
+
+    - name: Output result to screen
+      ansible.builtin.debug:
+        var: sudoers_output.stdout_lines

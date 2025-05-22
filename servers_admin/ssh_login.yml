@@ -1,0 +1,7 @@
+- name: Log into client nodes using ssh key and new user
+  hosts: all
+  become: yes
+  become_user: jsmith
+  tasks:
+    - name: Test SSH connection
+      ansible.builtin.ping:

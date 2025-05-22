@@ -1,0 +1,66 @@
+- name: Install and configure vsftpd server
+  hosts: file_servers
+  become: true
+
+  vars: # Define variables at the beginning
+    ftp_users:
+      - name: jsparrow
+        password: LizSwann2003
+      - name: ppan
+        password: TinkerBell1902
+    ftp_root_dir: /var/ftp
+    ftp_port: 21
+
+  tasks:
+    - name: Install vsftpd server
+      ansible.builtin.yum: # Use yum package manager to install vsftpd on Fedora machine
+        name: vsftpd
+        state: present
+
+    - name: Create vsftpd.conf file
+      ansible.builtin.file: # create file module to create vsftpd.conf configuration file
+        path: /etc/vsftpd.conf
+        state: touch
+
+    - name: Configure vsftpd server
+      ansible.builtin.lineinfile: # Use lineinfile to write information to vsftpd.conf file
+        path: /etc/vsftpd.conf
+        line: "{{ item.key }}={{ item.value }}"
+      with_dict: # loop through and use the key:value pairs to write lines
+        - anonymous_enable: 'NO'
+          local_enable: 'YES'
+          write_enable: 'YES'
+          local_umask: '022'
+          secure_chroot_dir: '/var/run/vsftpd/empty'
+          pam_service_name: 'vsftpd'
+          rsa_cert_file: “'/etc/pkillow_writeable_chroot' 'YES'”
+
+    - name: Create FTP Users
+      ansible.builtin.user: # Use user module to create FTP users, since we have two users, we have to use the variable substitution or variable interpolation, that is using “{{ }}”
+        name: "{{ item.name }}" # name of new FTP user
+        password: "{{ item.password | password_hash('sha512') }}" # password of new FTP user
+        createhome: no
+        home: "{{ ftp_root_dir }}/{{ item.name }}" # creates /var/ftp/jsparrow and /var/ftp/ppan
+        shell: /bin/bash # specify bash shell as the default shell
+      loop: "{{ ftp_users }}" # ftp_users point to the vars on the top of this playbook
+
+    - name: Configure FTP Directory Permissions
+      ansible.builtin.file:
+        path: "{{ ftp_root_dir }}/{{ item.name }}" # variables are recalled and used multiple times
+        state: directory
+        mode: '2775' # The 2 in 2775 indicates that the setgid bit is set, which causes new files and directories created within the directory to inherit the group ownership of the parent directory (ftp in this case). 
+        owner: "{{ item.name }}" # variables are recalled and used multiple times
+        group: "{{ item.name }}" # variables are recalled and used multiple times
+      loop: "{{ ftp_users }}" # variables are recalled and used multiple times
+
+    - name: Allow FTP through Firewall
+      ansible.posix.firewalld: # need port 21 to be opened and in listening state
+        service: ftp
+        permanent: yes
+        state: enabled # service is enabled so automatically starts at OS start-up
+        immediate: yes
+
+    - name: Restart vsftpd service
+      ansible.builtin.service:
+        name: vsftpd
+        state: restarted # restart vsftpd service, equivalent to ‘systemctl restart vsftpd’

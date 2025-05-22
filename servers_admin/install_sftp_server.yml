@@ -1,0 +1,62 @@
+- name: Install SFTP server on Fedora/CentOS/Red Hat/EC2 Linux
+  hosts: all
+  become: true
+  vars: # add your variables here
+    sftp_user: sftpuser
+    sftp_dir: /var/sftp # this is where all sftp directories will go
+    sftp_data_dir: /var/sftp/sftpdata # this is for sftp_user account
+
+  tasks:
+    - name: Add a new user and set the password
+      ansible.builtin.user:
+        name: "{{ sftp_user }}"
+        password: "{{ 'B3llaVita!@#' | password_hash('sha512') }}"
+        update_password: always
+
+    - name: Create the SFTP directory
+      ansible.builtin.file:
+        path: "{{ sftp_dir }}"
+        state: directory
+
+    - name: Create the SFTP data directory
+      ansible.builtin.file:
+        path: "{{ sftp_data_dir }}"
+        state: directory
+
+    - name: Set ownership of SFTP directories
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        owner: "{{ item.owner }}"
+        group: "{{ item.group }}"
+        mode: "{{ item.mode }}"
+      loop: # use the loop to read the dictionaries below to set correct directory ownership
+        - { path: "{{ sftp_dir }}", owner: "root", group: "root", mode: "0755" } # for root user
+        - { path: "{{ sftp_data_dir }}", owner: "{{ sftp_user }}", group: "{{ sftp_user }}", mode: "0700" } # for sftp_user
+
+    - name: Copy sshd_config.j2 file from current working directory to /etc/ssh/
+      ansible.builtin.copy:
+        src: sshd_config.j2
+        dest: /etc/ssh/
+        mode: '0600'
+        owner: root
+        group: root
+
+    - name: Modify sshd_config file # use jinja2 template file to update the sshd_config file
+      ansible.builtin.template:
+        src: sshd_config.j2
+        dest: /etc/ssh/sshd_config
+        owner: root
+        group: root
+        mode: '0600'
+      notify: restart sshd
+
+    - name: Check sshd_config file syntax
+      ansible.builtin.command: sshd -t
+      register: sshd_config_syntax
+      ignore_errors: yes
+
+  handlers:
+    - name: restart sshd
+      ansible.builtin.systemd:
+        name: sshd
+        state: restarted

@@ -1,0 +1,31 @@
+- hosts: all
+  become: true
+  pre_tasks:	# mandates this play to run with the priority.				
+  collections:
+    - ansible.builtin
+
+  - name: install updates (Ubuntu)
+    apt:
+      upgrade: dist
+      update_cache: yes
+    when: ansible_distribution == "Ubuntu"
+
+  - name: install updates (Fedora)
+    dnf:
+      update_only: yes
+      update_cache: yes
+    when: ansible_distribution == "Fedora"
+
+#YAML folded block scalar
+- name: Install useful Linux tools
+  hosts: file_server, web_server
+  become: true
+
+  tasks:
+    - name: Install htop, nmon, and iftop packages
+      package:
+        name:
+          - htop
+          - nmon
+          - iftop
+        state: latest

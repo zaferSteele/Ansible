@@ -1,0 +1,24 @@
+- hosts: all
+  become: true
+  collections:
+    - community.general
+
+  tasks:
+    - name: Ensure httpd is running on Fedora
+      ansible.builtin.service:
+        name: httpd
+        state: started
+      when: ansible_distribution == "Fedora"
+
+    - name: Open http port 80 on Fedora
+      community.general.firewalld: # Ansible module
+        service: http
+        permanent: true
+        state: enabled
+      when: ansible_distribution == "Fedora"
+
+    - name: Restart firewalld service for new service to kick-in
+      ansible.builtin.service:
+        name: firewalld
+        state: restarted
+      when: ansible_distribution == "Fedora"

@@ -1,0 +1,28 @@
+- name: Uninstall mariadb
+  hosts: db_server # specify target group here
+  become: true
+  collections:
+    - ansible.builtin
+
+  tasks:
+#    - name: Install htop, nmon, and iftop packages
+#      package:
+#        name:
+#          - htop
+#          - nmon
+#          - iftop
+#        state: latest
+
+    - name: install mariadb package (Ubuntu) # install maridDB on Ubuntu nodes
+      apt:
+        name: mariadb-server
+        state: absent
+      when: ansible_distribution == "Ubuntu"
+
+    - name: install mariadb package (Fedora) # install maridDB on Fedora nodes
+      dnf:
+        name:
+          - mariadb # be carful with the package names
+          - mariadb-server # be carful with the package names
+        state: absent
+      when: ansible_distribution == "Fedora"

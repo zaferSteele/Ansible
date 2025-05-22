@@ -1,0 +1,44 @@
+- hosts: all
+  become: true
+  collections:
+    - ansible.builtin
+
+  tasks:
+    - name: Update package cache on Red Hat distros
+      dnf:
+        update_cache: yes
+      when: ansible_distribution in ['Fedora', 'Red Hat', 'CentOS']
+
+    - name: Update package cache on Debian distros
+      apt:
+        update_cache: yes
+      when: ansible_distribution in ['Ubuntu', 'Debian',  'Pop!_OS']
+
+    - name: Install apache2 package on Ubuntu
+      apt:
+        name: apache2
+      when: ansible_distribution == "Ubuntu"
+
+    - name: Install httpd package on Fedora
+      dnf:
+        name: httpd # The package name is different
+      when: ansible_distribution == "Fedora"
+
+    - name: Ensure httpd is running on Fedora
+      service:
+        name: httpd # the package name is different
+        state: started # ensure the service is running
+      when: ansible_distribution == "Fedora"
+
+    - name: Open http port 80 on Fedora
+      firewalld: # Ansible module
+        service: http
+        permanent: true # make this a permanent setting
+        state: enabled # ensure the service starts at start-up
+      when: ansible_distribution == "Fedora"
+
+    - name: Restart firewalld service for new service to kick-in
+      service:
+        name: firewalld # service name
+        state: restarted # restart firewalld service
+      when: ansible_distribution == "Fedora"

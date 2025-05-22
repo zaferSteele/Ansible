@@ -1,0 +1,13 @@
+- hosts: all
+  become: true
+
+  tasks:
+    - name: Uninstall packages on Linux
+      ansible.builtin.package:
+        name:
+          - "{{ apache_package }}"
+          - "{{ php_package }}"
+          - "{{ tmux_package }}"
+          - "{{ tree_package }}"
+        state: absent
+        update_cache: yes

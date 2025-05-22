@@ -1,0 +1,45 @@
+- hosts: db_server # specify target group here
+  become: true
+  collections:
+    - ansible.builtin  
+
+  pre_tasks: # mandates this play to run with the priority.
+  - name: install updates (Ubuntu)
+    apt:
+      upgrade: dist
+      update_cache: yes
+    when: ansible_distribution == "Ubuntu"
+
+  - name: install updates (Fedora)
+    dnf:
+      update_only: yes
+      update_cache: yes
+    when: ansible_distribution == "Fedora"
+
+#YAML folded block scalar
+- name: Install useful Linux tools
+  hosts: db_server # specify target group here
+  become: true
+
+  tasks:
+    - name: Install htop, nmon, and iftop packages
+      package:
+        name:
+          - htop
+          - nmon
+          - iftop
+        state: latest
+
+    - name: install mariadb package (Ubuntu) # install maridDB on Ubuntu nodes
+      apt:
+        name: mariadb-server
+        state: latest
+      when: ansible_distribution == "Ubuntu"
+
+    - name: install mariadb package (Fedora) # install maridDB on Fedora nodes
+      dnf:
+        name: 
+          - mariadb # be carful with the package names
+          - mariadb-server # be carful with the package names
+        state: latest
+      when: ansible_distribution == "Fedora"

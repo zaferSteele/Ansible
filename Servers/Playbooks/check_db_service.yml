@@ -1,0 +1,25 @@
+- hosts: db_server
+  become: true
+  collections:
+    - ansible.builtin
+
+  tasks:
+  - name: Start MariaDB service
+    systemd:
+      name: mariadb
+      state: started
+      enabled: true
+    when: ansible_distribution == "Fedora"
+
+  - name: Start MariaDB service
+    service:
+      name: mariadb
+      state: started
+      enabled: true
+    when: ansible_distribution == "Ubuntu"
+
+  - name: Check status of mariadb service
+    service_facts:
+    register: service_state
+  - debug:
+      var: service_state.ansible_facts.services["mariadb.service"].state

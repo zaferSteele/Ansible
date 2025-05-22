@@ -1,0 +1,18 @@
+- hosts: db_server
+  become: true
+  collections:
+    - ansible.builtin
+
+  tasks:
+  - name: Checking service status
+    command: systemctl status "{{ item }}"
+    with_items:
+    - sshd
+    - mariadb
+    when: ansible_distribution == "Fedora"
+    register: service_state
+    ignore_errors: yes
+
+  - name: Display service statet
+    debug:
+     var: service_state

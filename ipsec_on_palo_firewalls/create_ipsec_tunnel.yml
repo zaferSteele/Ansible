@@ -1,0 +1,95 @@
+---
+- name: Create IPSec Tunnel with defined variables
+  hosts: palo  # Targeting the Palo Alto device
+  gather_facts: false  # Skipping gathering facts
+  connection: local
+
+  vars:
+    provider:  # Connection parameters for the Palo Alto device
+      ip_address: '{{ inventory_hostname }}'  # IP address of the device
+      username: '{{ pan_username }}'  # Prompted username
+      password: '{{ pan_password }}'  # Prompted password
+
+  collections:
+    - paloaltonetworks.panos  # Using the Palo Alto Networks collection
+
+  vars_prompt:  # Prompting for username and password
+    - name: "pan_username"
+      prompt: "login as"  # Prompt message for username
+      private: no
+
+    - name: "pan_password"
+      prompt: "Password"  # Prompt message for password
+      private: yes
+
+  tasks:
+  - name: Create tunnel.1  # Creating a tunnel
+    panos_tunnel:
+      provider: '{{ provider }}'
+      if_name: "tunnel.1"
+      vr_name: 'default'
+      zone_name: 'VPN_Test'
+      commit: 'False'  # Skipping immediate commit
+
+  - name: Create IKE crypto profile  # Creating IKE crypto profile
+    panos_ike_crypto_profile:
+      provider: '{{ provider }}'
+      name: 'ike-profile-test'
+      dh_group: ['group20']
+      authentication: ['sha512']
+      encryption: ['aes-256-cbc']
+      lifetime_hours: '8'
+      commit: 'False'
+
+  - name: Create IPSec crypto profile  # Creating IPSec crypto profile
+    panos_ipsec_profile:
+      provider: '{{ provider }}'
+      name: 'ipsec-profile-test'
+      dh_group: 'group20'
+      esp_authentication: ['sha512']
+      esp_encryption: ['aes-256-gcm']
+      lifetime_hours: '1'
+      commit: 'False'
+
+  - name: Create IKE Gateway  # Creating IKE gateway
+    panos_ike_gateway:
+      provider: '{{ provider }}'
+      name: 'IKEGW-TEST'
+      version: 'ikev2'
+      interface: 'ethernet1/9'
+      local_ip_address_type: 'ip'
+      local_ip_address: '1.1.1.1'
+      enable_passive_mode: 'False'
+      enable_nat_traversal: 'True'
+      enable_liveness_check: 'True'
+      liveness_check_interval: '5'
+      peer_ip_value: '2.2.2.2'
+      pre_shared_key: 'secretkey'
+      ikev2_crypto_profile: 'ike-profile-test'
+      commit: 'False'
+
+  - name: Create IPSec tunnel  # Creating IPSec tunnel
+    panos_ipsec_tunnel:
+      provider: '{{ provider }}'
+      name: 'IPSecTunnel-Test'
+      tunnel_interface: 'tunnel.1'
+      ak_ike_gateway: 'IKEGW-TEST'
+      ak_ipsec_crypto_profile: 'ipsec-profile-test'
+      commit: 'False'
+
+  - name: Add IPSec IPv4 Proxy ID  # Adding IPSec IPv4 Proxy ID
+    panos_ipsec_ipv4_proxyid:
+      provider: '{{ provider }}'
+      name: 'Id1'
+      tunnel_name: 'IPSecTunnel-Test'
+      local: '10.10.50.0/24'
+      remote: '192.168.50.0/24'
+      commit: 'False'
+
+  - name: Create Static route  # Creating a static route
+    panos_static_route:
+      provider: '{{ provider }}'
+      name: 'TESTroute_192.168.50.0-24'
+      destination: '192.168.50.0/24'
+      interface: 'tunnel.1'
+      nexthop_type: 'none'

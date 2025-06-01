@@ -1,0 +1,22 @@
+---
+provider:
+  ip_address: '{{ inventory_hostname }}'
+  username: admin
+  password: Palo123!
+
+admins:
+  deon:
+    pan_username: deon
+    pan_password: qwer@sed
+  jenny:
+    pan_username: jenny
+    pan_password: dflgj#wl
+  owen:
+    pan_username: owen
+    pan_password: Asdf@sew
+  jachie:
+    pan_username: jachie
+    pan_password: Wq@esdf
+  reeva:
+    pan_username: reeva
+    pan_password: Jkhu!kdfd

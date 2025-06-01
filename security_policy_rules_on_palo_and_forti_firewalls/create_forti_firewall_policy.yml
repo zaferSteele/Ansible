@@ -1,0 +1,40 @@
+---
+- name: Create Firewall Policy Rule
+  hosts: forti
+  gather_facts: false
+  connection: httpapi
+  collections:
+    - fortinet.fortios
+
+  vars:
+   ansible_httpapi_use_ssl: no
+   ansible_httpapi_validate_certs: no
+   ansible_httpapi_port: 80
+
+  tasks:
+  - name: Create firewall policy
+    fortios_firewall_policy:
+      vdom: "root"
+      state: "present"
+      firewall_policy:
+        name: "Internal-to-Internet Rule"
+        policyid: "10"
+        action: "accept"
+        srcaddr:
+         -
+            name: "Internal_Subnet"
+        srcintf:
+         -
+            name: "port1"
+        dstaddr:
+         -
+            name: "all"
+        dstintf:
+         -
+            name: "port2"
+        service:
+         -
+            name: "HTTPS"
+        nat: "enable"
+        status: "enable"
+        schedule: "always" 

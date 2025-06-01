@@ -1,0 +1,3 @@
+rule_name,description,tag_name,source_zone,source_ip,source_user,destination_ip,category,application,service,action,destination_zone,location
+Block-Outbound-Malicious-IPs,,,any,any,any,Malware-Domain-List,any,any,any,deny,Internet,top
+Block-Inbound-Malicious-IPs,,,Internet,Malware-Domain-List,any,any,any,any,any,deny,any,top

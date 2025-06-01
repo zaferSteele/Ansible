@@ -1,0 +1,14 @@
+---
+admins:
+ lifeng:
+   forti_username: lifeng
+   forti_password: qwer@sed
+ shannon:
+   forti_username: shannon
+   forti_password: dflgj#wl
+ osman:
+   forti_username: osman
+   forti_password: Asdf@sew
+ colin:
+   forti_username: colin
+   forti_password: Wq@esdf

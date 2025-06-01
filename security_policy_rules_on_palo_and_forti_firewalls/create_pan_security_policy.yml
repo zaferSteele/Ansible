@@ -1,0 +1,50 @@
+---
+- name: Create Security Policy Rule from csv
+  hosts: palo
+  gather_facts: false
+  connection: local
+
+  vars:
+    provider:
+      ip_address: '{{ inventory_hostname }}'
+      username: '{{ pan_username }}'
+      password: '{{ pan_password }}'
+
+  collections:
+    -  paloaltonetworks.panos
+
+  vars_prompt:
+    - name: "pan_username"
+      prompt: "login as"
+      private: no
+
+    - name: "pan_password"
+      prompt: "Password"
+      private: yes
+
+  tasks:
+   - name: Read the csv file
+     read_csv:
+       path: security_policy.csv
+     register: policy_list
+
+   - name: Display security policy list
+     debug:
+      msg: "{{ policy_list.list }}"
+
+   - name: Create Security Policy Rule
+     panos_security_rule:
+       provider: '{{ provider }}'
+       rule_name: '{{ item.rule_name }}'
+       description: '{{ item.description | default(omit) }}'
+       source_zone: '{{ item.source_zone | default(omit) }}'
+       destination_zone: '{{ item.destination_zone | default(omit) }}'
+       source_ip: '{{ item.source_ip | default(omit) }}'
+       source_user: '{{ item.source_user | default(omit) }}'
+       destination_ip: '{{ item.destination_ip | default(omit) }}'
+       application: '{{ item.application | default(omit) }}'
+       service: '{{ item.service | default(omit) }}'
+       action: '{{ item.action | default(omit) }}'
+       location: '{{ item.location | default(omit) }}'
+       commit: 'False'
+     loop: "{{ policy_list.list }}"

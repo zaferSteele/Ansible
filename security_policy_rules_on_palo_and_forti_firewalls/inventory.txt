@@ -1,0 +1,9 @@
+
+[palo]
+192.168.127.31
+
+[forti]
+Forti01 ansible_host=192.168.127.32 ansible_user="admin" ansible_password="Forti123!"
+
+[forti:vars]
+ansible_network_os=fortinet.fortios.fortios

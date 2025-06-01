@@ -1,0 +1,39 @@
+---
+- name: Create object addresses from csv file
+  hosts: palo
+  gather_facts: false
+  connection: local
+
+  vars:
+    provider:
+      ip_address: '{{ inventory_hostname }}'
+      username: '{{ pan_username }}'
+      password: '{{ pan_password }}'
+
+  collections:
+    -  paloaltonetworks.panos
+
+  vars_prompt:
+    - name: "pan_username"
+      prompt: "login as"
+      private: no
+
+    - name: "pan_password"
+      prompt: "Password"
+      private: yes
+
+
+  tasks:
+   - name: Read the csv file
+     read_csv:
+       path: objects.csv
+     register: objects_list
+
+   - name: Create object addresses from the csv file
+     panos_address_object:
+       provider: '{{ provider }}'
+       name: '{{ item.name }}'
+       value: '{{ item.value }}'
+       description: '{{ item.description | default(omit) }}'
+       commit: False
+     loop: '{{ objects_list.list }}'

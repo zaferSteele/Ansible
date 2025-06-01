@@ -1,0 +1,20 @@
+---
+- name: Create Palo Alto Administrators
+  hosts: palo
+  gather_facts: false
+  connection: local
+  vars_files: vars.yml
+
+  collections:
+    -  paloaltonetworks.panos
+
+  tasks:
+  - name: Create admins
+    panos_administrator:
+      provider: '{{ provider }}'
+      admin_username: '{{ item.value.pan_username }}'
+      admin_password: '{{ item.value.pan_password }}'
+      superuser: 'yes'
+      commit: 'False'
+    loop: "{{ lookup('dict', admins) }}"
+    no_log: 'True'

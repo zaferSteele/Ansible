@@ -1,0 +1,29 @@
+---
+- name: Enable IP SFTP server
+  hosts: ios_xe_routers
+  gather_facts: false
+
+  vars_files:
+    - vars.yml
+
+  vars:
+    ios_file_name: "c8000v-universalk9.17.06.05.SPA.bin"
+    sftp_server_ip: "192.168.127.151"
+    sftp_username: "jdoe"
+    sftp_password: "Hugh060105"
+
+  tasks:
+    - name: Extend SSH timer to 99 mins
+      cisco.ios.ios_config:
+        commands:
+          - line vty 0 15
+          - exec-timeout 99 0
+
+    - name: COPY_NEW_IOS_FROM_FTP (192.168.127.151)
+      ansible.netcommon.cli_command:
+         command: 'copy sftp://{{ sftp_username }}:{{ sftp_password }}@{{ sftp_server_ip }}/{{ ios_file_name }} flash:/{{ ios_file_name }}'
+         check_all: True
+         prompt:
+           - 'Destination filename'
+         answer:
+           - '{{ ios_file_name }}'

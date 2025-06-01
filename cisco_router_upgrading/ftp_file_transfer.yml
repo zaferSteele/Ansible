@@ -1,0 +1,31 @@
+- name: Enable IP SCP server
+  hosts: c8kv01
+  gather_facts: false
+
+  vars_files:
+    - vars.yml
+
+  vars:
+    ios_file_name: "c8000v-universalk9.17.06.05.SPA.bin"
+    scp_server_ip: "192.168.127.151"
+    scp_username: "jdoe"
+    scp_password: "Secur3P@ssw0rd"
+    ftp_file_path: "/ppan/{{ ios_file_name }}"
+    flash_path: "flash:/{{ ios_file_name }}"
+
+
+  tasks:
+    - name: Extend SSH timer to 99 mins
+      cisco.ios.ios_config:
+        commands:
+          - line vty 0 15
+          - exec-timeout 99 0
+
+    - name: COPY_NEW_IOS_FROM_FTP (192.168.127.151)
+      ansible.netcommon.cli_command:
+         command: 'copy ftp://ppan:TinkerBell1902@192.168.127.151/{{ ios_file_name }} flash/{{ ios_file_name }}'
+         check_all: True
+         prompt:
+           - 'Destination filename'
+         answer:
+           - '{{ ios_file_name }}'

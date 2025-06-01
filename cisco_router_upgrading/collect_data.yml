@@ -1,0 +1,28 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars_prompt:
+    - name: "sudoer_name"
+      prompt: "Sudoer name"
+      private: no
+    - name: "ansible_become_pass"
+      prompt: "Sudo Password"
+      private: yes
+      confirm: yes
+    - name: "ios_file_md5"
+      prompt: "New IOS MD5 value"
+      private: no
+    - name: "ios_file_name"
+      prompt: "New IOS File name (.bin)"
+      private: no
+
+  tasks:
+    - name: Print User Entered Information
+      ansible.builtin.debug:
+        msg: |
+          Sudoer name: {{ sudoer_name }}
+          Sudo Password: {{ ansible_become_pass }}
+          New IOS MD5 value: {{ ios_file_md5 }}
+          New IOS File name (.bin): {{ ios_file_name }}

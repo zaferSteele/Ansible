@@ -1,0 +1,26 @@
+---
+- name: Check FTP service status on f38c1
+  hosts: ftp_server
+  gather_facts: false
+
+  vars_files:
+    - vars_ftp.yml
+
+  tasks:
+    - name: Check FTP service status
+      command: systemctl status vsftpd
+      register: ftp_status
+      ignore_errors: true # ignore errors while executing the command
+
+#    - name: Display FTP service status
+#      ansible.builtin.debug:
+#        msg: "{{ ftp_status.stdout }}"
+
+    - name: Display FTP service status
+      ansible.builtin.debug:
+        msg: |
+          {{
+            ftp_status.stdout_lines
+              | map('regex_replace', '^\\s+', '')
+              | join('\n')
+          }}

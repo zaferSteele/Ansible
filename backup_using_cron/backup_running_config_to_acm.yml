@@ -1,0 +1,37 @@
+---
+- name: Check and create backup directory on Ansible Control machine
+  hosts: localhost # Run on Ansible Control Machine, f38s1
+  gather_facts: false
+
+  tasks:
+    - name: Check if backup directory exists
+      ansible.builtin.stat:
+        path: ./backup
+      register: backup_dir
+
+    - name: Create backup directory
+      ansible.builtin.file:
+        path: ./backup
+        state: directory
+      when: not backup_dir.stat.exists
+
+- name: Backup Cisco IOS-XE Router and Switch configurations
+  hosts: ios_xe_devices  # Targeted devices
+  gather_facts: false
+
+  vars_files:
+    - vars.yml
+
+  vars:
+    timestamp: "{{ lookup('pipe', 'date +%Y%m%d-%H%M') }}"
+
+  tasks:
+    - name: Run show run and save to a file
+      cisco.ios.ios_config:
+       backup: yes
+       backup_options:
+         filename: "{{ inventory_hostname }}-running-config.cfg"
+         dir_path: ./backup/{{ timestamp }}_backup
+
+    - name: Print message when completed
+      ansible.builtin.debug: msg="{{ inventory_hostname }} - Backup to local storage completed"

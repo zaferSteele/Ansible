@@ -1,0 +1,73 @@
+---
+- name: Check and create backup directory on Ansible Control machine
+  hosts: localhost # Run on Ansible Control Machine, f38s1
+  gather_facts: false
+
+  tasks:
+    - name: Check if backup directory exists
+      ansible.builtin.stat:
+        path: ./backup
+      register: backup_dir
+
+    - name: Create backup directory
+      ansible.builtin.file:
+        path: ./backup
+        state: directory
+      when: not backup_dir.stat.exists
+
+- name: Backup Cisco IOS-XE Router and Switch configurations
+  hosts: ios_xe_devices  # Targeted devices
+  gather_facts: false
+
+#  vars_files:
+#    - vars.yml
+
+  vars:
+    timestamp: "{{ lookup('pipe', 'date +%Y%m%d-%H%M') }}"
+    ansible_user: jdoe
+    ansible_password: 5uper5cret9assw0rd
+
+  tasks:
+    - name: Run show run and save to a file
+      cisco.ios.ios_config:
+       backup: yes
+       backup_options:
+         filename: "{{ inventory_hostname }}-running-config.cfg"
+         dir_path: ./backup/{{ timestamp }}_backup
+
+    - name: Print message when completed
+      ansible.builtin.debug: msg="{{ inventory_hostname }} - Backup to local storage completed"
+
+- name: Copy backup files to SCP server
+  hosts: localhost  # Run locally
+  gather_facts: false
+
+#  vars_files:
+#    - vars.yml
+
+  vars:
+    scp_servers:
+      - ip: "192.168.127.151"
+        path: "/home/jdoe/"
+      - ip: "192.168.127.161"
+        path: "/home/jdoe/"
+      - ip: "192.168.127.162"
+        path: "/home/jdoe/"
+    passphrase_response: K0ala2023!@#$
+
+  tasks:
+    - name: Run SCP command
+      ansible.builtin.expect:
+        command: "scp -r ./backup jdoe@{{ item.ip }}:{{ item.path }}"
+        responses:
+          "Enter passphrase for key '/home/jdoe/.ssh/id_ed25519':": "{{ passphrase_response }}"
+      register: scp_output
+      loop: "{{ scp_servers }}"
+
+    - name: Print message when completed
+      ansible.builtin.debug: msg="Device backup file transfer to SCP completed"
+
+    - name: Remove backup directory
+      ansible.builtin.file:
+        path: "./backup/"
+        state: absent

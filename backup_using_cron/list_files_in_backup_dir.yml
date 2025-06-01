@@ -1,0 +1,19 @@
+---
+
+- name: Check files in folder
+  hosts: file_servers  # Targeted devices
+  gather_facts: false
+
+  vars_files:
+    - vars.yml
+
+  tasks:
+    - name: List files in backup directory
+      ansible.builtin.find:
+        paths: /home/jdoe/backup/
+        file_type: directory
+      register: dir_list
+
+    - name: Display file names
+      ansible.builtin.debug:
+        var: dir_list.files

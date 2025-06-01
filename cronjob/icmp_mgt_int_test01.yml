@@ -1,0 +1,22 @@
+---
+- name: Ping hosts and display output
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Ping hosts
+      raw: ping -c 4 {{ item }}
+      register: ping_output
+      loop:
+        - 192.168.127.151 # SCP server
+        - 192.168.127.11 # r1 
+        - 192.168.127.12 # r2
+        - 192.168.127.113 # r13
+        - 192.168.127.21 # sw1
+        - 192.168.127.22 # sw2
+        - 192.168.127.123 # sw23
+      changed_when: false
+
+    - name: Display output
+      debug:
+        var: ping_output.results | map(attribute='stdout_lines') | list 

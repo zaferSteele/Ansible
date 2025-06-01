@@ -1,0 +1,17 @@
+---
+- name: Ping hosts and save output  # playbook name
+  hosts: localhost  # this machine
+  gather_facts: false  # no gathering facts 
+
+  tasks:
+    - name: Ping hosts  # task name
+      raw: ping -c 4 192.168.127.{{ item }}  # ping 4 times to each IP address
+      register: ping_output  # Stores the command output in the 'ping_output' variable
+      with_sequence: start=11 end=12  # Iterates from 11 to 14, using each value as an 'item'
+      changed_when: false  # task is not considered 'changed' if executed
+      failed_when: false  # task is not considered 'failed' even if runs into errors
+
+    - name: Save output to file  # task name
+      copy:
+        content: "{{ ping_output.results | map(attribute='stdout') | join('\n') }}"  # Extracts the 'stdout' attribute from each item in 'ping_output.results' and joins them with newlines
+        dest: 12.2_icmp_output.txt  # save the output to current directory

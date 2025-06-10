@@ -1,0 +1,13 @@
+[defaults]
+# private_key_file = ~/.ssh/ansible
+private_key_file = ~/.ssh/id_rsa
+interpreter_python=/usr/bin/python3.10
+retry_files_enabled = False 
+inventory= /etc/ansible/hosts/inventory.ini
+deprecation_warnings=False
+host_key_checking=False
+nocows=1
+command_warning=False
+forks = 50
+[persistent_connection]
+ssh_type = libssh

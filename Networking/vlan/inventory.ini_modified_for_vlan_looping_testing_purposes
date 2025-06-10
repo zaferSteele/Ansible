@@ -1,0 +1,85 @@
+#[r1]
+#r1 ansible_host=192.168.255.6
+#[r1:vars]
+#ansible_ssh_user=admin
+#ansible_ssh_pass=password
+#ansible_ssh_private_key_file= /home/user/.ssh/known_hosts
+#ansible_connection=network_cli
+#ansible_network_os=cisco.ios.ios
+#ansible_become=yes
+#ansible_become_method=enable
+#ansible_become_password=cisco
+
+[ios_devices:vars]
+ansible_network_os=cisco.ios.ios
+ansible_user=admin 
+ansible_ssh_pass=password
+#ansible_password=password
+ansible_connection=network_cli
+ansible_ssh_private_key_file= /home/user/.ssh/id_rsa
+ansible_become_method = enable
+ansible_become=yes
+ansible_command_timeout=3600
+ansible_ssh_timeout=3600
+
+
+[wlc:vars]
+
+ansible_connection=ssh
+ansible_network_os=aireos
+ansible_command_timeout=180
+
+[wlc]
+
+wlc01 ansible_host=192.168.255.30
+
+
+
+
+
+[routers_type1]
+# r1 ansible_host=192.168.255.14 uncomment this for later use 
+#r2 ansible_host=192.168.255.7 uncomment this for later use
+#r3 ansible_host=192.168.255.15 uncomment this for later use
+#r1 ansible_host=192.168.255.23
+
+[ospf_routers]
+r4 ansible_host=192.168.255.16
+r5 ansible_host=192.168.255.17
+r6 ansible_host=192.168.255.18
+r7 ansible_host=192.168.255.19
+
+[ios_xe_routers]
+
+c8kv01 ansible_host=192.168.255.12
+
+
+
+[switches_type1]
+
+# sw1 ansible_host=192.168.255.21
+# sw2 ansible_host=192.168.255.22
+# sw3 ansible_host=192.168.255.23
+# sw4 ansible_host=192.168.255.24
+sw1 ansible_host=192.168.255.8
+[servers]
+scp_server1 ansible_host=192.168.255.4
+scp_server2 ansible_host=192.168.255.3
+scp_server3 ansbile_host=192.168.255.5
+
+
+
+[ios_devices:children]
+
+# routers_type1
+# ios_xe_routers
+ospf_routers
+switches_type1
+
+
+[palo]
+
+192.168.255.70
+
+
+

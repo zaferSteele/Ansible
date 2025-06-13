@@ -1,0 +1,35 @@
+---
+- name: Now rendering Nexus device configuration data using Jinja Templates to create Nexus device configuration files
+  # Playbook for rendering Nexus device configurations using Jinja templates
+  hosts: localhost # Run tasks on the local machine (no remote hosts involved)
+  vars:
+    nexus_devices: {  # Define variables for Nexus devices
+        "nx-osv-1": { # Device 1 configuration
+            "hostname": "nx-osv-1", # Device hostname
+            "username": "cisco", # Login username
+            "password": "cisco", # Login password
+            "vlans": [100, 200, 300], # VLANs to configure
+            "l3_vlan_interfaces": True,  # Enable L3 interfaces on VLANs
+            "vlan_interfaces": [  # Define VLAN interfaces with IPs
+              {"int_num": "100", "ip": "192.168.10.1"},
+              {"int_num": "200", "ip": "192.168.20.1"},
+              {"int_num": "300", "ip": "192.168.30.1"}
+            ],
+            "netflow_enable": True # Enable NetFlow on this device
+        },
+        "nx-osv-2": {
+            "hostname": "nx-osv-2", # Device 2 configuration
+            "username": "cisco", # Device hostname
+            "password": "cisco", # Login password
+            "vlans": [100, 200, 300], # VLANs to configure
+            "l3_vlan_interfaces": False, # No L3 VLAN interfaces
+            "netflow_enable": False # NetFlow not enabled
+
+        }
+    }
+  tasks:
+  - name: Create switch configuration files # Render and write configuration files per device
+    template:
+      src=/home/user/testautomation/venv/ansible/nxos.j2 
+      dest=/home/user/testautomation/venv/ansible/{{ item.key }}.conf 
+    with_dict: "{{ nexus_devices }}" # Loop through each device definition

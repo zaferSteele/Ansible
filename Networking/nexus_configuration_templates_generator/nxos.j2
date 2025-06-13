@@ -1,0 +1,23 @@
+{# Set device hostname #}
+hostname {{ item.value.hostname }}
+{# Enable features #}
+feature telnet
+feature ospf
+feature bgp
+feature interface-vlan
+{% if item.value.netflow_enable %}
+feature netflow  
+{% endif %}
+{# Create user account #}
+username {{ item.value.username }} password {{ item.value.password }} role network-operator
+{# Configure VLANs #}
+{% for vlan_num in item.value.vlans %}
+vlan {{ vlan_num }}
+{% endfor %}
+{% if item.value.l3_vlan_interfaces %}
+{# Configure VLAN interfaces if L3 enabled #}
+{% for vlan_interface in item.value.vlan_interfaces %}
+interface {{ vlan_interface.int_num }}
+    ip address {{ vlan_interface.ip }}/24
+{% endfor %}
+{% endif %}

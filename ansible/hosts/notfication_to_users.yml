@@ -1,0 +1,9 @@
+- name: Send a message to logged-in users and log them out from the ssh session
+  hosts: all
+  become: true
+  tasks:
+  - name: Send a message to all users
+    ansible.builtin.command: >
+      wall "Attention all users, please be advised that system maintenance will begin in 30 min. Please save any unsaved work and 
+          log out of the system to avoid any potential data loss we apolgoise for any inconvenience caused."
+    ignore_errors: yes

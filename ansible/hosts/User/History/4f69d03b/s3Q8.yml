@@ -1,0 +1,14 @@
+interface1:
+  description: "To r1"
+  ip_address: "1.1.13.3"
+  subnet_mask: "255.255.255.0"
+
+interface2:
+  description: "To r2"
+  ip_address: "1.1.23.3"
+  subnet_mask: "255.255.255.0"
+
+interface3: 
+  description: "To r3 local"
+  ip_address: "1.1.30.1"
+  subnet_mask: "255.255.255.0"

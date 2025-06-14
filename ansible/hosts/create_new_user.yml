@@ -1,0 +1,12 @@
+---
+- name: Create a new user with password
+  hosts: all
+  become: true
+  tasks:
+  - name: Add user
+    ansible.builtin.user:
+      name: Scott
+      password: "{{'Super5ecret9assword' | password_hash('sha512') }}"
+      shell: /bin/bash
+      state: present
+c

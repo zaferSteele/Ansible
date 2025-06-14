@@ -1,0 +1,9 @@
+- name: Restart OpenSSH server services on all hosts
+  hosts: all
+  become: true
+  tasks:
+  - name: Restart OpenSSH server
+    ansible.builtin.service:
+      name: ssh
+      state: restarted 
+      

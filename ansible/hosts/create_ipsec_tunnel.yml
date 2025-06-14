@@ -1,0 +1,93 @@
+- name: Create Ipsec Tunnel with defined variables
+  hosts: palo
+  gather_facts: false
+  connection: local
+
+
+  vars: 
+    provider:
+      ip_address: '{{ inventory_hostname }}'
+      username: '{{ pan_username }}'
+      password: '{{ pan_password }}'
+
+  vars_prompt:
+  - name: "pan_username"
+    prompt: "login as"
+    private: no
+
+
+  - name: "pan_password"
+    prompt: "Password"
+    private: yes 
+
+  tasks:
+  - name: Create tunnel.1
+    paloaltonetworks.panos.panos_tunnel:
+      provider: '{{ provider }}'
+      if_name: "tunnel.1"
+      vr_name: 'default'
+      zone_name: 'VPN_Test'
+      commit: 'False'
+      
+  - name: Create IKE crypto profile
+    paloaltonetworks.panos.panos_ike_crypto_profile:
+      provider: '{{ provider }}'
+      name: 'ike-profile-test'
+      dh_group: ['group20']
+      authentication: ['sha512']
+      encryption: ['aes-256-cbc']
+      lifetime_hours: '8'
+      commit: 'False'
+    
+  - name: Create IPSec crypto profile
+    paloaltonetworks.panos.panos_ipsec_profile:
+      provider: '{{ provider }}'
+      name: 'ipsec-profile-test'
+      dh_group: 'group20'
+      esp_authentication: ['sha512']
+      esp_encryption: ['aes-256-gcm']
+      lifetime_hours: '1'
+      commit: 'False'
+
+  - name: Create IKE Gateway
+    paloaltonetworks.panos.panos_ike_gateway:
+      provider: '{{ provider }}'
+      name: 'IKEGW-TEST'
+      version: 'ikev2'
+      interface: 'ethernet1/1' 
+      local_ip_address: '3.3.3.3'
+      enable_passive_mode: False 
+      enable_nat_traversal: True
+      enable_liveness_check: True
+      liveness_check_interval: '5' 
+      peer_ip_value: '1.1.1.1'
+      pre_shared_key: 'secretkey'
+      ikev2_crypto_profile: 'ike-profile-test'
+      commit: 'False'
+    
+  - name: Create IPSec tunnel
+    paloaltonetworks.panos.panos_ipsec_tunnel:
+      provider: '{{ provider }}'
+      name: 'IPSecTunnel-Test'
+      tunnel_interface: 'tunnel.1'
+      ak_ike_gateway: 'IKEGW-TEST'
+      ak_ipsec_crypto_profile: 'ipsec-profile-test'
+      commit: 'False'
+
+  - name: Add IPSec IPv4 Proxy ID
+    paloaltonetworks.panos.panos_ipsec_ipv4_proxyid:
+      provider: '{{ provider }}'
+      name: 'Id1'
+      tunnel_name: 'IPSecTunnel-Test'
+      local: '10.10.30.0/24'
+      remote: '10.10.10.0/24'
+      commit: 'False'
+
+  - name: Create Static route
+    paloaltonetworks.panos.panos_static_route:
+      provider: '{{ provider }}'
+      name: 'TESTroute_10.10.10.0-24'
+      destination: '10.10.10.0/24'
+      interface: 'tunnel.1'
+      nexthop_type: 'none'
+

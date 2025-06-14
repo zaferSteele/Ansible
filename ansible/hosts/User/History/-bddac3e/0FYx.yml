@@ -1,0 +1,51 @@
+- name: Upgrade Cisco IOS-XE Routers
+  hosts: ios_xe_routers
+  gather_facts: true 
+  vars_files: vars.yml # read vars.yml for variables
+  max_fail_percentage: 0 # If any host fails. the application will exit, in percentage
+
+  tasks:
+  - name: Check current IOS-XE version from gathered IOS facts
+    ios_facts:
+
+  - name: Debug current and new IOS versions
+    ansible.builtin.debug:
+      msg:
+        - "Current version: {{ ansible_net_version }}" # Informational
+        - "New version    : {{ new_ios_version }}" # Informational
+  
+  - name: Quit playbook if ansible_net_version equals new_ios_version
+    block:
+      - name: Fail if versions are equal or current IOS is newer
+        ansible.builtin.fail:
+          msg: "Current IOS version is already up to date."
+        when: ansible_net_version >= new_ios_version
+  
+      - name: Debug Message
+        ansible.builtin.debug:
+          msg: "Continuing with the playbook, upgrading IOS version..."
+        ignore_errors: true
+  
+  - name: Create directories on the SFTP server
+    hosts: scp_server1
+
+    tasks:
+    - name: Get ansible date/time facts
+      ansible.builtin.setup:
+        filter: "ansible_date_time"
+        gather_subset: "!all"
+    
+    - name: Store DTG as a fact
+      ansible.builtin.set_fact:
+        DTG: "{{ ansible_date_time.date }}"
+
+    - name: Create Directory for backup
+      ansible.builtin.file:
+        path: "~/{{ DTG }}" # /home/user/2025-05-05
+        state: directory
+        mode: "0775"
+      run_once: true
+      
+
+
+        

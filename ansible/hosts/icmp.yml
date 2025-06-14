@@ -1,0 +1,6 @@
+- hosts: routers_type2
+  gather_facts: true
+  tasks:
+  - name: Test reachability to Cisco IOS XE Routers 
+    ansible.builtin.ping:
+    

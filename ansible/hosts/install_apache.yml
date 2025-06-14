@@ -1,0 +1,9 @@
+---
+- name: Install Apache web server
+  hosts: web1
+  become: true
+  tasks:
+  - name: Install Apache Web server
+    ansible.builtin.apt:
+      name: apache2
+      state: present 

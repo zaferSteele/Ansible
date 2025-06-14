@@ -1,0 +1,63 @@
+- name: Configure Cisco IOS-XE routers' interfaces
+  hosts: ospf_routers
+  gather_facts: false
+
+  tasks:
+  - name: Load config files 
+    include_vars: # Assign .yml file to the variable r_config
+      file: "{{ inventory_hostname }}.yml" # the inventory_hostname must match the router name
+      name: r_config
+
+  - name: Confiugre OSPF global attirbutes
+    cisco.ios.ios_command: #Execute a series of IOS commands to target nodes
+      commands:
+      - "configure terminal"
+      - "router ospf 1"
+      - "router-id {{ r_config.loopback0.ip_address }}"
+      - "end"
+  - name: Configure OSPF on routers area 0
+    cisco.ios.ios_command: #Execute a series of IOS commands to target nodes
+      commands:
+      - "configure terminal"
+      - "router ospf 1"
+      - "network {{ r_config.interface1.ip_address }} 0.0.0.0 area 0" 
+      - "network {{ r_config.interface2.ip_address }} 0.0.0.0 area 0" 
+      - "end"
+    when: inventory_hostname == 'r4'
+  - name: Configure OSPF on routers area border routers
+    cisco.ios.ios_command: #Execute a series of IOS commands to target nodes
+      commands:
+      - "router ospf 1"
+      - "network {{ r_config.interface1.ip_address }} 0.0.0.0 area 0" 
+      - "network {{ r_config.interface2.ip_address }} 0.0.0.0 area 1"
+      - "end"
+    when: inventory_hostname in ['r5','r6']
+  - name: Configure OSPF on routers area 1
+    cisco.ios.ios_command: #Execute a series of IOS commands to target nodes
+      commands:
+      - "configure terminal"
+      - "router ospf 1"
+      - "network {{ r_config.interface1.ip_address }} 0.0.0.0 area 1" 
+      - "network {{ r_config.interface2.ip_address }} 0.0.0.0 area 1" 
+      - "end"
+    when: inventory_hostname == 'r7' 
+
+
+  - name: Advertise LAN networks of OSPF area 0
+    cisco.ios.ios_command:
+      commands:
+      - "configure terminal"
+      - "router ospf 1"
+      - "network {{ r_config.interface3.ip_address }} 0.0.0.255 area 0"
+      - "end"
+    when: inventory_hostname == 'r4'
+  - name: Advertise LAN networks of OSPF area 1
+    cisco.ios.ios_command:
+      commands:
+      - "configure terminal"
+      - "router ospf 1"
+      - "network {{ r_config.interface3.ip_address }} 0.0.0.255 area 1"
+      - "end"
+    when: inventory_hostname == 'r7'
+      
+      

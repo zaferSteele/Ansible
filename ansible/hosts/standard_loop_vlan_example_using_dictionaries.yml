@@ -1,0 +1,38 @@
+# Ansible Playbook: Configure VLANs with Descriptions and IP Addresses on Cisco IOS
+# Description: Creates VLANs, assigns descriptions, and configures SVI (Switch Virtual Interface) IPs.
+# Requirements:
+#   - Ansible with cisco.ios collection (`ansible-galaxy collection install cisco.ios`)
+#   - SSH access to Cisco IOS device with enable mode privileges
+# Usage:
+#   ansible-playbook -i inventory.yml configure_vlans.yml
+---
+- name: Add Multiple VLANs with IPs  # Play name (describes the overall task)
+  hosts: "r6"  # Target device (defined in inventory)
+  gather_facts: false  # Skip gathering facts to speed up execution
+
+  vars:
+    # Dictionary of VLANs with their configuration:
+    # - Key: VLAN ID (e.g., 100)
+    # - Value: Dictionary containing description and IP address
+    vlans: {
+        "100": {"description": "floor_1", "ip": "192.168.10.1"},
+        "200": {"description": "floor_2", "ip": "192.168.20.1"},
+        "300": {"description": "floor_3", "ip": "192.168.30.1"}
+    }
+
+  tasks:
+    # Task 1: Create VLANs
+    - name: Add VLANs  # Creates VLANs on the switch
+      cisco.ios.ios_config:  # Uses the Cisco IOS config module
+        lines:
+          - "vlan {{ item.key }}"  # Creates VLAN with current dictionary key (e.g., 100)
+      with_dict: "{{ vlans }}"  # Loops through the vlans dictionary
+
+    # Task 2: Configure VLAN descriptions and IP addresses (SVIs)
+    - name: Configure VLAN Interfaces  # Sets up SVI for each VLAN
+      cisco.ios.ios_config:
+        lines:
+          - "description {{ item.value.description }}"  # Sets VLAN description
+          - "ip address {{ item.value.ip }} 255.255.255.0"  # Assigns IP to VLAN interface
+        parents: "interface vlan {{ item.key }}"  # Specifies parent command (enters SVI config mode)
+      with_dict: "{{ vlans }}"  # Loops through the vlans dictionary again

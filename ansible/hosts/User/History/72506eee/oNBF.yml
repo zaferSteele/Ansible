@@ -1,0 +1,21 @@
+- hosts: wlc 
+  gather_facts: no
+  vars_files: vars.yml
+  
+  vars:
+    wlc_version: 8.10.185.0 # New AireOS version
+  
+  tasks:
+
+  - name: Execute show boot command
+    cisco.aireos.aireos_command:
+      username: "{{ ansible_user }}"
+      password: "{{ ansible_ssh_pass }}"
+      commands: show boot
+      wait_for:
+      - result[0] not contains '{{ wlc_version }}' # fails the playbook if the same version is found
+    register: output1
+  
+  - ansible.builtin.debug:
+      var: output1.stdout_lines
+      

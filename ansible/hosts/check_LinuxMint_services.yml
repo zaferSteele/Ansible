@@ -1,0 +1,17 @@
+- hosts: db_servers 
+  become: true
+  collections:
+    - ansible.builtin
+  tasks:
+  - name: CHecking service status
+    command: systemctl status "{{ item }}"
+    with_items:
+    - ssh
+    - mariadb
+    when: ansible_distribution == "Linux Mint"
+    register: service_state
+    ignore_errors: yes
+
+  - name: Display service state
+    debug:
+      var: service_state

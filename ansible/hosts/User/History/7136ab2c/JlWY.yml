@@ -1,0 +1,38 @@
+- name: Configure Cisco IOS-XE routers' interfaces
+  hosts: ospf_routers
+  gather_facts: false
+
+  tasks:
+  - name: Load config files 
+    include_vars: # Assign .yml file to the variable r_config
+      file: "{{ inventory_hostname }}.yml" # the inventory_hostname must match the router name
+      name: r_config
+  
+  - name: Configure GigabitEthernet interfaces 0/1-0-2
+    cisco.ios.ios_command: #Execute a series of IOS commands to target nodes
+      commands:
+      - "configure terminal"
+      - "interface GigabitEthernet0/1"
+      - "description {{ r_config.interface1.description }}" # Insert description on Gi0/1
+      - "ip address {{ r_config.interface1.ip_address }} {{ r_config.interface1.subnet_mask }}" # Insert ip and subnet mask on Gi0/1
+      - "no shutdown" # Enable interface Gi0/1
+      - "interface GigabitEthernet0/2"
+      - "description {{ r_config.interface2.description }}"
+      - "ip address {{ r_config.interface2.ip_address }} {{ r_config.interface2.subnet_mask }}"
+      - "no shutdown"
+      - "interface loopback0"
+      - "ip address {{ r_config.loopback0.ip_address }} {{ r_config.loopback0.subnet_mask }}"
+      - "no shutdown"
+      - "end"
+  - name: Configure GigabitEthernet interfaces 0/3 for LAN network
+    cisco.ios.ios_command:
+      commands:
+      - "configure terminal"
+      - "interface GigabitEthernet0/3"
+      - "description {{ r_config.interface3.description }}"
+      - "ip address {{ r_config.interface3.ip_address }} {{ r_config.interface3.subnet_mask }}"
+      - "no shutdown"
+      - "end"
+    when: inventory_hostname in ['r4', 'r7']  
+      
+      

@@ -1,0 +1,29 @@
+
+# Ansible Playbook: Add Multiple VLANs to a Cisco IOS Device
+# Description: Configures VLANs on a Cisco IOS device (switch) using the `ios_config` module.
+# Usage: 
+#   ansible-playbook -i inventory.yml vlan_config.yml
+---
+- name: Add Multiple VLANs  # Play name (describes the overall task)
+  hosts: sw6  # Target host (defined in inventory)
+  gather_facts: false  # Disables facts gathering (not needed for config tasks)
+  
+  vars:
+    # List of VLAN IDs to configure
+    vlan_numbers: [100, 200, 300]  
+
+  tasks:
+    # Task 1: Configure VLANs using `ios_config`
+    - name: Configure VLANs  
+      cisco.ios.ios_config:  # Uses the Cisco IOS config module
+        commands:  # List of IOS commands to execute
+          - "vlan {{ item }}"  # Creates VLAN with current loop item (e.g., 100)
+          - "name VLAN_{{ item }}"  # Assigns a name (e.g., "VLAN_100")
+      loop: "{{ vlan_numbers }}"  # Iterates over `vlan_numbers`
+      register: vlan_output  # Saves command output for debugging
+      ignore_errors: yes  # Continues playbook even if a VLAN fails
+
+    # Task 2: Display VLAN configuration results (for debugging)
+    - name: Show VLAN configuration results  
+      debug:  # Prints output to console
+        var: vlan_output.results  # Shows detailed results for each VLAN attempt

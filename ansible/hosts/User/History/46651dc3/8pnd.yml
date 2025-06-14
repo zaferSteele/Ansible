@@ -1,0 +1,26 @@
+- hosts: wlc
+  gather_facts: no
+  vars_files: vars.yml 
+  
+  tasks:
+  - name: Run show sysinfo and check to see if the output contains Cisco Controller
+    community.network.aireos_command:
+      commands: sysinfo
+      wait_for: result[0] contains 'Cisco Controller'
+    register: check_sysinfo_output
+
+  - name: Display check sysinfo output
+    ansible.builtin.debug:
+      var: check_sysinfo.output.stdout_lines
+  
+  - name: Run multiple commands on remote nodes
+    community.network.aireos_command:
+      commands:
+        - show interface summary
+    register: mutltiple_commands_ouput
+  
+  - name: Display mutliple commands output
+    ansible.builtin.debug:
+      var: multiple_commands_output.stdout.lines
+
+

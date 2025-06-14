@@ -1,0 +1,7 @@
+- hosts: all
+  become: true
+  tasks:
+  - name: Install apache2 package on ubuntu servers
+    ansible.builtin.apt:
+      name: apache2
+    when: ansible_distibution=='Ubuntu'

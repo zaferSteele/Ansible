@@ -1,0 +1,2 @@
+#!/bin/bash
+sudo EDITOR=nano ansible-vault edit vars.yml

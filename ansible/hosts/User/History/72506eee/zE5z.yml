@@ -1,0 +1,11 @@
+- hosts: wlc 
+  gather_facts: no
+  vars_files: vars.yml
+  
+  vars:
+    wlc_version: 8.10.185.0 # New AireOS version
+  
+  tasks:
+
+  - name: Execute show boot command
+    ansible.builtin.raw: "show boot"

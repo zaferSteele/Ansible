@@ -1,0 +1,8 @@
+- name: Copy ruuning-config to startup-config
+  hosts: routers_type1
+  gather_facts: false
+  tasks:
+  - name: Copy running-config to startup-config
+    cisco.ios.ios_command:
+      commands:
+      - "write memory"

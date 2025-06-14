@@ -1,0 +1,30 @@
+- name: Configure trunk ports on sw1's gi0/0
+  cisco.ios.ios_command:
+    commands:
+    - "configure terminal"
+    - "interface g0/0"
+    - "switchport trunk encapsulation dot1q"
+    - "switchport mode trunk"
+    - "switchport trunk allowed vlan 10,20"
+  when: inventory_hostname=='sw1'
+
+- name: Configure trunk ports on sw1 and sw2
+  cisco.ios.ios_command:
+    commands:
+    - "configure terminal"
+    - "interface range g0/1, g0/2"
+    - "switchport trunk encapsulation dot1q"
+    - "switchport mode trunk"
+    - "switchport trunk allowed vlan 10,20"
+  when: inventory_hostname in ['sw1', 'sw2']
+
+- name: Configure trunk ports on sw3 and sw4
+  cisco.ios.ios_command:
+    commands:
+    - "configure terminal"
+    - "interface range g0/2, g0/3"
+    - "switchport trunk encapsulation dot1q"
+    - "switchport mode trunk"
+    - "switchport trunk allowed vlan 10,20"
+  when: inventory_hostname in ['sw3', 'sw4']
+  

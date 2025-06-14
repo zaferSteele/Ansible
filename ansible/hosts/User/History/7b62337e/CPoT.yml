@@ -1,0 +1,18 @@
+- name: Ping hosts and display output
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Ping hosts 
+      ansible.builtin.raw: ping -c 4 {{item}}
+      register: ping_output
+      loop:
+      - 192.168.255.3 # SCP router
+      - 192.168.255.16 # R4 router
+      - 192.168.255.17 # R5 router
+      - 192.168.255.18 # R6 router
+      - 192.168.255.19 # R7 router
+      - 192.168.255.8  # SW1
+      changed_when: false # setting to let the failed message display on the screen
+    - name: Display output
+      ansible.builtin.debug:
+        var: ping_output.results | map(attribute='stdout_lines') | list # Modify the last line

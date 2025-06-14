@@ -1,0 +1,16 @@
+- hosts: wlc 
+  gather_facts: no
+  vars_files: vars.yml
+  
+  vars:
+    wlc_version: 8.10.185.0 # New AireOS version
+  
+  tasks:
+
+  - name: Execute show boot command
+    ansible.builtin.expect:
+      command: ssh user@192.168.255.30
+      responses:
+        password: "{{ ansible_password }}"
+        '.*#': "show boot\n"
+    

@@ -1,0 +1,21 @@
+- hosts: db1
+  become: true 
+  pre_tasks:
+    collections:
+    - ansible.builtin
+  - name: install updates (Linux Mint)
+    apt:
+      upgrade: dist
+      update_cache: yes
+  when: ansible_distribution == "Linux Mint"
+
+- name: Install useful Linux tools 
+  hosts: db1   
+  tasks:
+  - name: Install htop, nmon, and iftop packages
+    ansible.builtin.package:
+      name: ['htop', 'nmon', 'iftop']
+      state: latest
+      update_cache: yes
+
+

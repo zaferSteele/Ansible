@@ -1,0 +1,27 @@
+- name: Hello Ansible Playbook for printing and appending to a file
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+  - name: Check if file exists
+    ansible.builtin.stat:
+      path: "hello_ansible.txt"
+    register: file_stat
+
+  - name: Create the file if it doesn't exist
+    ansible.builtin.file:
+      path: "hello_ansible.txt"
+      state: touch
+    when: file_stat.stat.exists == false
+  
+  - name: Get the current date and time
+    ansible.builtin.command: date +"%Y-%m-%d %H:%M:%S"
+    register: current_datetime
+  
+  - name: Append to file
+    ansible.builtin.lineinfile:
+      path: "hello_ansible.txt"
+      line: "Hello Ansible! {{ current_datetime.stdout }}"
+      insertafter: EOF
+    delegate_to: localhost
+    

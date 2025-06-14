@@ -1,0 +1,55 @@
+- name: Create object addresses from csv file
+  hosts: palo 
+  gather_facts: false
+  connection: local
+  
+  vars: 
+    provider: 
+      ip_address: '{{ inventory_hostname }}'
+      username: '{{ pan_username }}'
+      password: '{{ pan_password }}'
+  
+  vars_prompt:
+
+  - name: "pan_username"
+    prompt: "login as"
+    private: no
+
+  - name: "pan_password"
+    prompt: "Password"
+    private: yes
+
+  tasks:
+    
+  - name: Read the csv file
+    delegate_to: localhost
+    community.general.read_csv:
+      path: objects_address.csv
+    register: objects_address_list
+  
+  - name: Create a tag with colour
+    paloaltonetworks.panos.panos_tag_object:
+      provider: '{{ provider }}'
+      name: 'test_object'
+      color: 'red'
+      commit: False
+  
+  - name: Create object address with tag 
+    paloaltonetworks.panos.panos_address_object: 
+      provider: '{{ provider }}'
+      name: '{{ item.name }}'
+      value: '{{ item.value }}'
+      tag: '{{ item.tag }}'
+      description: '{{ item.description | default(omit) }}'
+      commit: False
+    loop: '{{ objects_address_list.list }}'
+  
+  - name: Create object address group 
+    paloaltonetworks.panos.panos_address_group:
+      provider: '{{ provider }}'
+      name: 'test_object_group'
+      dynamic_value: 'test_object'
+      commit: False
+
+
+

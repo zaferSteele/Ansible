@@ -1,4 +1,0 @@
-- name: Ansible Ping
-  hosts: all
-  tasks:
-    - ping:

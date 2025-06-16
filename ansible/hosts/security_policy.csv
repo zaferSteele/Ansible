@@ -1,4 +1,0 @@
-﻿order,rule_name,description,tag_name,source_zone,source_ip,source_user,destination_ip,category,application,service,action,destination_zone
-08,Block-Outbound-Malicious-IPs,,,any,any,any,Spamhaus-DROP,any,any,any,deny,internet
-09,Block-Inbound-Malicious-IPs,,,internet,Spamhaus-DROP,any,any,any,any,any,deny,any
-10,Block-All,Deny all other traffic not explicitly allowed ,,any,any,any,any,any,any,any,deny,any

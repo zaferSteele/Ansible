@@ -1,7 +1,0 @@
-2025-05-02 07:08:03.304 [warning] Creation of workbench contribution 'workbench.contrib.preferencesActions' took 36ms.
-2025-05-02 07:08:03.448 [warning] Creation of workbench contribution 'workbench.chat.setup' took 47ms.
-2025-05-02 07:08:06.348 [info] Started local extension host with pid 2584.
-2025-05-02 07:08:20.620 [error] [File Watcher] Unexpected error: inotify_add_watch on '/etc/ansible/hosts/logs/20250419T045838/window1/exthost/ms-python.debugpy' failed: No such file or directory (EUNKNOWN) (path: /etc/ansible/hosts)
-2025-05-02 07:08:20.631 [error] [File Watcher (universal)] inotify_add_watch on '/etc/ansible/hosts/logs/20250419T045838/window1/exthost/ms-python.debugpy' failed: No such file or directory
-2025-05-02 07:08:21.867 [info] Settings Sync: Account status changed from uninitialized to unavailable
-2025-05-02 07:08:24.019 [info] [perf] Render performance baseline is 362ms

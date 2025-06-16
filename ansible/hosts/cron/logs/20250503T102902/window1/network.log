@@ -1,6 +1,0 @@
-2025-05-03 10:29:33.637 [error] #5: https://www.vscode-unpkg.net/_gallery/ms-python/vscode-pylance/latest - error GET Failed to fetch
-2025-05-03 10:29:33.643 [error] #2: https://www.vscode-unpkg.net/_gallery/000000/jinja2/latest - error GET Failed to fetch
-2025-05-03 10:29:33.650 [error] #7: https://www.vscode-unpkg.net/_gallery/wyattferguson/jinja2-snippet-kit/latest - error GET Failed to fetch
-2025-05-03 10:29:33.656 [error] #6: https://www.vscode-unpkg.net/_gallery/samuelcolvin/jinjahtml/latest - error GET Failed to fetch
-2025-05-03 10:29:33.706 [error] #3: https://www.vscode-unpkg.net/_gallery/ms-python/debugpy/latest - error GET Failed to fetch
-2025-05-03 10:29:34.795 [error] #8: https://marketplace.visualstudio.com/_apis/public/gallery/extensionquery - error POST Failed to fetch

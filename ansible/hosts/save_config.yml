@@ -1,9 +1,0 @@
-- name: Copy ruuning-config to startup-config
-  hosts: ospf_routers
-  gather_facts: false
-
-  tasks:
-  - name: Copy running-config to startup-config
-    cisco.ios.ios_command:
-      commands:
-      - "write memory"

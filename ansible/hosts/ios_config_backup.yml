@@ -1,7 +1,0 @@
-- name: Back Up IOS Device Configurations
-  hosts: r6
-  gather_facts: false
-  tasks:
-    - name: backup
-      ios_config:
-        backup: yes

@@ -1,2 +1,0 @@
-2025-05-02 07:08:20.722 [error] [File Watcher] Unexpected error: inotify_add_watch on '/etc/ansible/hosts/logs/20250419T045838/window1/exthost/ms-python.debugpy' failed: No such file or directory (EUNKNOWN) (path: /etc/ansible/hosts)
-2025-05-02 07:08:20.722 [error] [File Watcher (universal)] inotify_add_watch on '/etc/ansible/hosts/logs/20250419T045838/window1/exthost/ms-python.debugpy' failed: No such file or directory

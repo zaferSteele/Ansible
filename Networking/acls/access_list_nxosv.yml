@@ -1,0 +1,93 @@
+---
+- name: Configure Access List
+  hosts: "nxosv-devices"
+  gather_facts: false
+  connection: local
+
+  vars:
+    cli:  # CLI connection parameters for NX-OS devices. These are gathered from inventory variables.
+      host: "{{ ansible_host }}"
+      username: "{{ ansible_user }}"
+      password: "{{ ansible_ssh_pass }}"
+      transport: cli  # Ensure we're using CLI mode to talk to the device
+
+  tasks:
+    # Using the nxos_acl module to define rules within an access control list (ACL) on Cisco NX-OS devices.
+    - name: Deny TCP traffic from 172.16.0.0/12
+      nxos_acl:
+        name: border_inbound  # ACL name applied to the interface
+        seq: 20  # Sequence number determines order of rule processing
+        action: deny  # This rule blocks traffic
+        proto: tcp
+        src: 172.16.0.0/12  # Private IP block to deny
+        dest: any
+        log: enable  # Logs denied packets for visibility
+        state: present
+
+    - name: Deny TCP traffic from 192.168.0.0/16
+      nxos_acl:
+        name: border_inbound
+        seq: 30
+        action: deny
+        proto: tcp
+        src: 192.168.0.0/16  # Another private IP range being denied
+        dest: any
+        state: present
+        log: enable
+
+    - name: Permit TCP SSH access to 10.0.0.9
+      nxos_acl:
+        name: border_inbound
+        seq: 40
+        action: permit  # Allow this traffic
+        proto: tcp
+        src: any
+        dest: 10.0.0.9/32  # Destination is a specific host
+        dest_port_op: eq  # Match port exactly
+        dest_port1: 22  # SSH port
+        state: present
+        log: enable
+
+    - name: Permit TCP HTTP access to 10.0.0.9
+      nxos_acl:
+        name: border_inbound
+        seq: 50
+        action: permit
+        proto: tcp
+        src: any
+        dest: 10.0.0.9/32
+        dest_port_op: eq 
+        dest_port1: 80  # HTTP port
+        state: present
+        log: enable
+
+    - name: Permit established TCP sessions
+      nxos_acl:
+        name: border_inbound
+        seq: 60
+        action: permit  
+        proto: tcp
+        src: any
+        dest: any
+        state: present
+        log: enable
+        established: enable  # Allows return traffic for sessions initiated from inside
+
+    - name: Default deny for all other traffic
+      nxos_acl:
+        name: border_inbound
+        seq: 1000  # High number to ensure this is the last rule evaluated
+        action: deny 
+        proto: ip  # Deny all IP traffic by default
+        src: any
+        dest: any
+        state: present
+        log: enable
+
+    # Using the nxos_acl_interface module to bind the defined ACL to a specific interface.
+    - name: Apply ACL to ingress of Ethernet 2/4
+      nxos_acl_interface: 
+        name: border_inbound  # Applying the ACL we just defined
+        interface: Ethernet2/4  # Target interface
+        direction: ingress  # Traffic entering the interface
+        state: present

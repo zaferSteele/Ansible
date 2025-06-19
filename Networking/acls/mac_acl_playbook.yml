@@ -1,0 +1,35 @@
+---
+# This playbook configures a MAC address access list on a Cisco IOS device.
+# Target device: nyc-edg-r1
+
+- name: Configure MAC Access List
+  hosts: "nyc-edg-r1"  # Host or inventory group name
+  gather_facts: false  # No need to collect system facts for this task
+  connection: local     # We're running this playbook from the control node (no SSH session created)
+
+  vars:
+    cli:
+      host: "{{ ansible_host }}"       # IP or DNS name of the router
+      username: "{{ ansible_user }}"   # Username for router login
+      password: "{{ ansible_ssh_pass }}"  # Password for router login
+
+  tasks:
+    - name: Deny Hosts with vendor id fa16.3e00.0000  
+      # This task creates MAC access list 700:
+      # Denies MAC addresses starting with vendor prefix fa16.3e
+      # Permits all other MAC addresses as a fallback (required for ACLs to avoid blocking everything)
+      ios_config: 
+        lines:
+          - access-list 700 deny fa16.3e00.0000 0000.00FF.FFFF
+          - access-list 700 permit 0000.0000.0000 FFFF.FFFF.FFFF
+
+    - name: Apply filter on bridge group 1
+      # This task applies the MAC access list to an interface within a bridge group.
+      # Bridge groups are used on IOS to apply Layer 2 features like MAC filtering.
+      # The filter is applied only on ingress (input) traffic.
+      ios_config:
+        lines: 
+          - bridge-group 1
+          - bridge-group 1 input-address-list 700
+        parents:
+          - interface GigabitEthernet0/1  # Target interface to apply the ACL

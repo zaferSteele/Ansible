@@ -1,9 +1,9 @@
 ---
-ansible_host: 192.168.255.20
-ansible_user: cisco
-ansible_ssh_pass: cisco
-ansible_connection: network_cli
-ansible_network_os: nxos
-ansbile_become: yes
-ansible_become_method: enable
-ansible_become_pass: cisco
+ansible_host: 192.168.255.20            # Management IP of the NX-OS device to configure
+ansible_user: cisco                     # Username for logging into the device
+ansible_ssh_pass: cisco                 # Password for SSH login
+ansible_connection: network_cli         # Use Ansible's network_cli plugin for network device communication
+ansible_network_os: nxos                # Target network operating system (Cisco NX-OS)
+ansible_become: yes                     # Enable privilege escalation (similar to 'enable' mode in Cisco)
+ansible_become_method: enable           # Method used to elevate privileges (uses 'enable' command)
+ansible_become_pass: cisco              # Password used to enter privileged EXEC mode

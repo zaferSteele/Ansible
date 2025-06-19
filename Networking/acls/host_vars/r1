@@ -1,9 +1,9 @@
 ---
-ansible_host: 192.168.255.21
-ansible_user: cisco
-ansible_ssh_pass: cisco
-ansible_connection: network_cli
-ansible_network_os: ios
-ansbile_become: yes
-ansible_become_method: enable
-ansible_become_pass: cisco
+ansible_host: 192.168.255.21            # IP address of the target network device
+ansible_user: cisco                     # SSH username for login
+ansible_ssh_pass: cisco                 # SSH password for login
+ansible_connection: network_cli         # Use network_cli to connect to network devices over SSH
+ansible_network_os: ios                 # Specifies the OS type; 'ios' means Cisco IOS (not NX-OS)
+ansible_become: yes                     # Enables privilege escalation 
+ansible_become_method: enable           # Method to escalate privileges on network devices (uses 'enable' mode)
+ansible_become_pass: cisco              # Password to enter privileged EXEC mode on the device
